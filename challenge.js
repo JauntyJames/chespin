@@ -1,4 +1,5 @@
 // James Perry Hartman
+// Smarter Travel assignment for integration engineer position
 // Task 1
 
 let output = '';
@@ -20,12 +21,18 @@ let $resultsContainer = $('.listings.infinite-scroll-enabled');
 let list = $resultsContainer.children('li');
 
 $( document ).ready(() => {
-  $resultsContainer.prepend("<div class=\"running-total\"><li>" + list.length + "</li><p> hotels</p></div>");
+  $resultsContainer.prepend('<div class="running-total"><span>' + list.length + '</span><span>hotels</span></div>')
+  $('.running-total').css({
+    "position": "sticky",
+    "top": "0",
+    "z-index": "2",
+    "background-color": "#0082E6"
+  })
 })
 
 $( document ).ajaxComplete(() => {
   list = $resultsContainer.children('li');
-  $('.running-total li').html(list.length);
+  $('.running-total:first-child').html(list.length);
 });
 
 // Task 3
@@ -33,7 +40,7 @@ $( document ).ajaxComplete(() => {
 $( document ).ready(() => {
   let $select = $('span:contains(Select)')
   $('#slidePanel').append(
-    "<div id=\"selected-menu\">Selected Hotels:<div id=\"hotel-tiles\"></div></div>"
+    '<div id="selected-menu">Selected Hotels:<div id="hotel-tiles"></div></div>'
   );
   let hotelList = [];
   let idList = [];
@@ -46,7 +53,6 @@ $( document ).ready(() => {
       price: parseInt(hotelData[hotelData.length - 1]),
       id: parseInt(hotelData[1])
     }
-    let found = false;
     if (!idList.includes(newHotel.id)) {
       hotelList.push(newHotel);
       idList.push(newHotel.id);
@@ -54,12 +60,12 @@ $( document ).ready(() => {
     hotelList.sort((a, b) => {
       return a.price - b.price
     })
-    let $hotelTiles = $()
+    let hotelTiles = [];
     hotelList.forEach((hotel) => {
-      $hotelTiles.add( "<div>" + hotel.name + ": $" + hotel.price + "</div>" )
+      hotelTiles.push( "<div>" + hotel.name + ": $" + hotel.price + "</div>" )
     })
-    $hotelTiles = $hotelTiles.wrapAll("<div id=\"hotel-tiles\"/>")
-    $('#hotel-tiles').replaceWith( $hotelTiles )
+    hotelTiles = hotelTiles.join('')
+    $('#hotel-tiles').replaceWith( '<div id="hotel-tiles">' + hotelTiles + '</div>')
   });
 })
 
