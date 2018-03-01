@@ -29,39 +29,20 @@ $( document ).ajaxComplete(() => {
 });
 
 // Task 3
-
-$( document ).ready(() => {
-  let $select = $('span:contains(Select)')
-  $('#slidePanel').append(
-    "<div id=\"selected-menu\">Selected Hotels:<div id=\"hotel-tiles\"></div></div>"
-  );
-  let hotelList = [];
-  let idList = [];
-  $select.on('click', (event) => {
-    event.preventDefault(); // take this out before submitting
-    let $hotel = $(event.currentTarget).closest('li');
-    let hotelData = $hotel.attr('data-info').split('|');
-    let newHotel = {
-      name: $hotel.attr('data-title'),
-      price: parseInt(hotelData[hotelData.length - 1]),
-      id: parseInt(hotelData[1])
-    }
-    let found = false;
-    if (!idList.includes(newHotel.id)) {
-      hotelList.push(newHotel);
-      idList.push(newHotel.id);
-    }
-    hotelList.sort((a, b) => {
-      return a.price - b.price
-    })
-    let $hotelTiles = $()
-    hotelList.forEach((hotel) => {
-      $hotelTiles.add( "<div>" + hotel.name + ": $" + hotel.price + "</div>" )
-    })
-    $hotelTiles = $hotelTiles.wrapAll("<div id=\"hotel-tiles\"/>")
-    $('#hotel-tiles').replaceWith( $hotelTiles )
-  });
-})
+let $select = $('span:contains(Select)');
+let $slidePanel = $('#slidePanel');
+$slidePanel.append("<div id=\"selected-hotels\">Selected Hotels:<br/></div>");
+let hotelList = [];
+$select.on('click', (event) => {
+  event.preventDefault();
+  let $hotel = $event.currentTarget).closest('li');
+  let name = $hotel.attr('data-title');
+  let price = $hotel.children('.old-price-cont ins').html();
+  if (!hotelList.includes($hotel)){
+    $('#selected-hotels').append("<div>" + name + ": " + price + "</div>");
+    hotelList.push($hotel);
+  }
+});
 
 // <div class="compression-messaging">
 //   <div class="percentage">
@@ -78,4 +59,4 @@ $( document ).ready(() => {
 //     </div>
 //     <button class="cta icon icon-close"></button>
 //   </div>
-// </div >
+// </div>
