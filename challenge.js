@@ -2,86 +2,94 @@
 // Smarter Travel assignment for integration engineer position
 // Task 1
 
-let output = '';
+$( document ).ready(() => {
+  let output = '';
 
-let place = $('.summary h1').html();
-output += 'Destination: ' + place + '\n';
+  let place = $('.summary h1').text().split(',')
+  output += 'Destination: ' + place[0].trim() + ', ' + place[1].trim() + '\n';
 
-let dates = $('.search-dates').html();
-let checkIn = dates.split('-')[0].trim();
-output += 'Check in: ' + checkIn + '\n';
-let checkOut = dates.split('-')[1].trim();
-output += 'Check out: ' + checkOut + '\n';
+  let dates = $('.search-dates').text();
+  let checkIn = dates.split('-')[0].trim();
+  output += 'Check in: ' + checkIn + '\n';
+  let checkOut = dates.split('-')[1].trim();
+  output += 'Check out: ' + checkOut + '\n';
 
-console.log(output);
+  console.log(output);
 
 // Task 2
 
-let $resultsContainer = $('.listings.infinite-scroll-enabled');
-let list = $resultsContainer.children('li');
+  let $resultsContainer = $('.listings.infinite-scroll-enabled');
+  let list = $resultsContainer.children('li.hotel');
 
-$( document ).ready(() => {
-  $resultsContainer.prepend('<div class="running-total"><span>' + list.length + '</span><span>hotels</span></div>')
+  $resultsContainer.prepend(
+    '<div class="running-total"><span>Viewing </span><span class="number">' + 
+    list.length + '</span> <span>' + place[0] + ' hotels</span></div>'
+  )
   $('.running-total').css({
     "position": "sticky",
+    "display": "inline-block",
     "top": "0",
     "z-index": "2",
-    "background-color": "#0082E6"
+    "background-color": "#0082E6",
+    "color": "white",
+    "font-size": "14px",
+    "font-weight": "bold",
+    "padding": "8px"
   })
-})
 
-$( document ).ajaxComplete(() => {
-  list = $resultsContainer.children('li');
-  $('.running-total:first-child').html(list.length);
-});
+  $( document ).ajaxComplete(() => {
+    list = $resultsContainer.children('li');
+    $('.running-total .number').text(list.length);
+  });
 
 // Task 3
 
-$( document ).ready(() => {
-  let $select = $('span:contains(Select)')
   $('#slidePanel').append(
-    '<div id="selected-menu">Selected Hotels:<div id="hotel-tiles"></div></div>'
+    '<div id="selected-menu"><h3>Selected Hotels:</h3><div id="hotel-tiles"></div></div>'
   );
   let hotelList = [];
   let idList = [];
-  $select.on('click', (event) => {
-    event.preventDefault(); // take this out before submitting
-    let $hotel = $(event.currentTarget).closest('li');
-    let hotelData = $hotel.attr('data-info').split('|');
-    let newHotel = {
-      name: $hotel.attr('data-title'),
-      price: parseInt(hotelData[hotelData.length - 1]),
-      id: parseInt(hotelData[1])
-    }
-    if (!idList.includes(newHotel.id)) {
-      hotelList.push(newHotel);
-      idList.push(newHotel.id);
-    }
-    hotelList.sort((a, b) => {
-      return a.price - b.price
-    })
-    let hotelTiles = [];
-    hotelList.forEach((hotel) => {
-      hotelTiles.push( "<div>" + hotel.name + ": $" + hotel.price + "</div>" )
-    })
-    hotelTiles = hotelTiles.join('')
-    $('#hotel-tiles').replaceWith( '<div id="hotel-tiles">' + hotelTiles + '</div>')
+  $('#selected-menu').css({
+    "position": "fixed",
+    "bottom": "1em",
+    "z-index": "2",
+    "font-weight": "bold",
+    "width": "210px",
+    "padding": "5px",
+    "background-color": "#F5F5F5",
+    "border-top-width": "2px",
+    "border-color": "white"
+  })
+  
+  let handleButton = () => {
+    let $select = $('span:contains(Select)').parents('div.cta-wrap');
+    $select.on('click', (event) => {
+      event.preventDefault(); // take this out before submitting
+      let $hotel = $(event.currentTarget).closest('li');
+      let hotelData = $hotel.attr('data-info').split('|');
+      let newHotel = {
+        name: $hotel.attr('data-title'),
+        price: parseInt(hotelData[hotelData.length - 1]),
+        id: parseInt(hotelData[1])
+      }
+      if (!idList.includes(newHotel.id)) {
+        hotelList.push(newHotel);
+        idList.push(newHotel.id);
+      }
+      hotelList.sort((a, b) => {
+        return a.price - b.price
+      })
+      let hotelTiles = [];
+      hotelList.forEach((hotel) => {
+        hotelTiles.push( "<div>" + hotel.name + ": $" + hotel.price + "</div>" )
+      })
+      hotelTiles = hotelTiles.join('')
+      $('#hotel-tiles').replaceWith( '<div id="hotel-tiles">' + hotelTiles + '</div>')
+    });
+  };
+  handleButton();
+  $( document ).ajaxComplete(() => {
+    handleButton();
   });
 })
 
-// <div class="compression-messaging">
-//   <div class="percentage">
-//     <svg class="circle" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox=" 0 0 110 110" preserveAspectRatio="none">
-//       <circle cx="55" cy="55" r="52" class="stroke" stroke-width="6" stroke-dasharray="326.73" stroke-dashOffset="0" stroke-linecap="round"></circle>
-//     </svg>
-//     <div class="text">
-//       <span>64%</span>
-//     </div>
-//   </div>
-//   <div class="message-wrapper">
-//     <div class="message">
-//       <p>...<p>
-//     </div>
-//     <button class="cta icon icon-close"></button>
-//   </div>
-// </div >
