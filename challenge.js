@@ -5,14 +5,14 @@
 $( document ).ready(() => {
   let output = '';
 
-  let place = $('.summary h1').text().split(',')
-  output += 'Destination: ' + place[0].trim() + ', ' + place[1].trim() + '\n';
+  let place = $('.summary h1').text().split(',');
+  output += `Destination: ${place[0].trim()}, ${place[1].trim()}\n`;
 
   let dates = $('.search-dates').text();
   let checkIn = dates.split('-')[0].trim();
-  output += 'Check in: ' + checkIn + '\n';
+  output += `Check in: ${checkIn}\n`;
   let checkOut = dates.split('-')[1].trim();
-  output += 'Check out: ' + checkOut + '\n';
+  output += `Check out: ${checkOut}\n`;
 
   console.log(output);
 
@@ -22,9 +22,10 @@ $( document ).ready(() => {
   let list = $resultsContainer.children('li.hotel');
 
   $resultsContainer.prepend(
-    '<div class="running-total"><span>Viewing </span><span class="number">' + 
-    list.length + '</span> <span>' + place[0] + ' hotels</span></div>'
-  )
+    `<div class="running-total"><span>Viewing </span><span class="number">` + 
+    `${list.length} </span><span> ${place[0]} hotels</span></div>`
+  );
+
   $('.running-total').css({
     "position": "sticky",
     "display": "inline-block",
@@ -34,8 +35,9 @@ $( document ).ready(() => {
     "color": "white",
     "font-size": "14px",
     "font-weight": "bold",
-    "padding": "8px"
-  })
+    "padding": "8px",
+    "border-radius": "3px"
+  });
 
   $( document ).ajaxComplete(() => {
     list = $resultsContainer.children('li');
@@ -45,7 +47,8 @@ $( document ).ready(() => {
 // Task 3
 
   $('#slidePanel').append(
-    '<div id="selected-menu"><h3>Selected Hotels:</h3><div id="hotel-tiles"></div></div>'
+    '<div id="selected-menu"><h3>Selected Hotels:</h3>' + 
+    '<div id="hotel-tiles"></div></div>'
   );
   let hotelList = [];
   let idList = [];
@@ -58,19 +61,22 @@ $( document ).ready(() => {
     "padding": "5px",
     "background-color": "#F5F5F5",
     "border-top-width": "2px",
-    "border-color": "white"
-  })
+    "border-color": "white",
+    "border-radius": "5px"
+  });
   
   let handleButton = () => {
     let $select = $('span:contains(Select)').parents('div.cta-wrap');
+
     $select.on('click', (event) => {
-      event.preventDefault(); // take this out before submitting
+      event.preventDefault();
       let $hotel = $(event.currentTarget).closest('li');
       let hotelData = $hotel.attr('data-info').split('|');
       let newHotel = {
         name: $hotel.attr('data-title'),
         price: parseInt(hotelData[hotelData.length - 1]),
-        id: parseInt(hotelData[1])
+        id: parseInt(hotelData[1]),
+        link: $hotel.find('a').attr('href')
       }
       if (!idList.includes(newHotel.id)) {
         hotelList.push(newHotel);
@@ -78,18 +84,24 @@ $( document ).ready(() => {
       }
       hotelList.sort((a, b) => {
         return a.price - b.price
-      })
+      });
+
       let hotelTiles = [];
       hotelList.forEach((hotel) => {
-        hotelTiles.push( "<div>" + hotel.name + ": $" + hotel.price + "</div>" )
-      })
-      hotelTiles = hotelTiles.join('')
-      $('#hotel-tiles').replaceWith( '<div id="hotel-tiles">' + hotelTiles + '</div>')
+        hotelTiles.push(
+          `<div><a href="${hotel.link}">${hotel.name} - $${hotel.price}</a></div>` 
+        );
+      });
+
+      hotelTiles = hotelTiles.join('');
+      $('#hotel-tiles').replaceWith( 
+        `<div id="hotel-tiles">${hotelTiles}</div>`
+      );
     });
   };
   handleButton();
   $( document ).ajaxComplete(() => {
     handleButton();
   });
-})
+});
 
